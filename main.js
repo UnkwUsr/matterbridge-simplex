@@ -6,9 +6,9 @@ const { ciContentText, ChatInfoType } = require(
     "./lib/simplex-chat-client-typescript/dist/response",
 );
 
-run();
+listen_simplex();
 
-async function run() {
+async function init_simplex() {
     const chat = await ChatClient.create("ws://localhost:5225");
     // this example assumes that you have initialized user profile for chat bot via terminal CLI
     const user = await chat.apiGetActiveUser();
@@ -25,6 +25,13 @@ async function run() {
     console.log(`Bot address: ${address}`);
     // enables automatic acceptance of contact connections
     await chat.enableAddressAutoAccept();
+
+    return chat;
+}
+
+async function listen_simplex() {
+    const chat = await init_simplex();
+
     await processMessages(chat);
 
     async function processMessages(chat) {
