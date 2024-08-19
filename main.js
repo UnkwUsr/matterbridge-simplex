@@ -6,52 +6,50 @@ const { ciContentText, ChatInfoType } = require(
     "./lib/simplex-chat-client-typescript/dist/response",
 );
 
-listen_simplex();
+const simplex_contactId = 3;
+
+var simplex_chat;
+Promise.all([listen_simplex(), listen_matterbridge()]);
 
 async function init_simplex() {
     const chat = await ChatClient.create("ws://localhost:5225");
     // this example assumes that you have initialized user profile for chat bot via terminal CLI
     const user = await chat.apiGetActiveUser();
     if (!user) {
-        console.log("no user profile");
+        console.log("[simplex] no user profile");
         return;
     }
     console.log(
-        `Bot profile: ${user.profile.displayName} (${user.profile.fullName})`,
+        `[simplex] Bot profile: ${user.profile.displayName} (${user.profile.fullName})`,
     );
     // creates or uses the existing long-term address for the bot
     const address = (await chat.apiGetUserAddress()) ||
         (await chat.apiCreateUserAddress());
-    console.log(`Bot address: ${address}`);
-    // enables automatic acceptance of contact connections
-    await chat.enableAddressAutoAccept();
+    console.log(`[simplex] Bot address: ${address}`);
+    await chat.disableAddressAutoAccept();
 
     return chat;
 }
 
 async function listen_simplex() {
-    const chat = await init_simplex();
+    globalThis.simplex_chat = await init_simplex();
 
-    await processMessages(chat);
+    await processMessages(globalThis.simplex_chat);
 
     async function processMessages(chat) {
         for await (const r of chat.msgQ) {
             const resp = r instanceof Promise ? await r : r;
             switch (resp.type) {
-                case "contactConnected": {
-                    // sends welcome message when the new contact is connected
-                    const { contact } = resp;
-                    console.log(`${contact.profile.displayName} connected`);
-                    await chat.apiSendTextMessage(
-                        ChatType.Direct,
-                        contact.contactId,
-                        "Hello! I am a simple squaring bot - if you send me a number, I will calculate its square",
-                    );
-                    continue;
-                }
+                // case "contactConnected": {
+                //     // sends welcome message when the new contact is connected
+                //     const { contact } = resp;
+                //     console.log(`[simplex] ${contact.profile.displayName} connected`);
+                //     continue;
+                // }
                 case "newChatItem": {
-                    // const { chatInfo } = resp.chatItem;
+                    const { chatInfo } = resp.chatItem;
                     // if (chatInfo.type !== ChatInfoType.Direct) continue;
+                    console.log("id: ", chatInfo.contact.contactId);
 
                     const username = resp.user.localDisplayName;
                     const msg = ciContentText(resp.chatItem.chatItem.content);
@@ -64,13 +62,39 @@ async function listen_simplex() {
     }
 }
 
-// function simplex_send(text) {
-//     chat.apiSendTextMessage(
-//         ChatType.Direct,
-//         chatInfo.contact.contactId,
-//         text,
-//     );
-// }
+async function listen_matterbridge() {
+    while (true) {
+        try {
+            const response = await fetch("http://127.0.0.1:4242/api/messages");
+            if (!response.ok) {
+                throw new Error("[matterbridge] HTTP error ${response.status}");
+            }
+            const data = await response.json();
+
+            for (ev of data) {
+                await simplex_send(ev.text, ev.username);
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        } catch (error) {
+            console.error(
+                "[matterbridge] Error listening for messages:",
+                error,
+            );
+        }
+    }
+}
+
+async function simplex_send(text, username) {
+    text = username + ": " + text;
+    console.log("[simplex] Message resent successfully!");
+
+    await globalThis.simplex_chat.apiSendTextMessage(
+        ChatType.Direct,
+        simplex_contactId,
+        text,
+    );
+}
 
 function matterbridge_send(text, username) {
     const url = "http://127.0.0.1:4242/api/message";
