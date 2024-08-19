@@ -2,13 +2,14 @@ const { ChatClient } = require("./lib/simplex-chat-client-typescript");
 const { ChatType } = require(
     "./lib/simplex-chat-client-typescript/dist/command",
 );
-const { ciContentText, ChatInfoType } = require(
+const { ciContentText } = require(
     "./lib/simplex-chat-client-typescript/dist/response",
 );
 
+// TODO: currently idk how to get this number. This I get from newChatItem
 const simplex_contactId = 3;
 
-var simplex_chat;
+globalThis.simplex_chat = -1;
 Promise.all([listen_simplex(), listen_matterbridge()]);
 
 async function init_simplex() {
@@ -49,7 +50,6 @@ async function listen_simplex() {
                 case "newChatItem": {
                     const { chatInfo } = resp.chatItem;
                     // if (chatInfo.type !== ChatInfoType.Direct) continue;
-                    console.log("id: ", chatInfo.contact.contactId);
 
                     const username = resp.user.localDisplayName;
                     const msg = ciContentText(resp.chatItem.chatItem.content);
