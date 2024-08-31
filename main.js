@@ -135,7 +135,7 @@ function matterbridge_send(text, username, file = undefined) {
                 {
                     Data: content,
                     Name: filename,
-                    // Comment: ""
+                    Comment: text,
                 },
             ],
         };
