@@ -56,10 +56,14 @@ async function listen_simplex() {
                 case "newChatItem": {
                     const { chatInfo } = resp.chatItem;
                     if (chatInfo.type == ChatInfoType.ContactRequest) continue;
+                    // skipping, to not duplicate messages: one with text only
+                    // and second with text and file
+                    if (resp.chatItem.chatItem.file) continue;
 
                     const username = extract_username(resp);
                     const msg = ciContentText(resp.chatItem.chatItem.content);
                     if (msg) {
+                        console.log("Resending text");
                         matterbridge_send(msg, username);
                     }
                     break;
@@ -75,6 +79,7 @@ async function listen_simplex() {
                     const file = [content, filename];
 
                     const username = extract_username(resp);
+                    console.log("Resending file");
                     matterbridge_send(text, username, file);
                     break;
                 }
