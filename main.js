@@ -74,6 +74,9 @@ async function listen_simplex() {
                     if (type != "image") continue;
 
                     // example of image: data:image/jpg;base64,/9j/4AAQSkZ...
+                    // P.S. this takes only preview. Probably for bridge it is
+                    // enough, but for original file we need to use
+                    // apiReceiveFile(fileId)
                     const content = image.split("base64,")[1];
                     const filename = resp.chatItem.chatItem.file.fileName;
                     const file = [content, filename];
@@ -127,6 +130,31 @@ async function listen_simplex() {
 
 function matterbridge_send(text, username, file = undefined) {
     const url = "http://127.0.0.1:4242/api/message";
+    const data = prepare_data(text, username, file);
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            if (response.ok) {
+                console.log("[matterbridge] Message resent successfully!");
+            } else {
+                console.error(
+                    "[matterbridge] Error sending message:",
+                    response.status,
+                );
+            }
+        })
+        .catch((error) => {
+            console.error("[matterbridge] Error:", error);
+        });
+}
+
+function prepare_data(text, username, file) {
     const data = {
         text: text,
         username: username,
@@ -150,27 +178,7 @@ function matterbridge_send(text, username, file = undefined) {
             "*This message was hidden by sender. You can read it only from SimpleX Chat.*";
         delete data.Extra;
     }
-
-    fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-        .then((response) => {
-            if (response.ok) {
-                console.log("[matterbridge] Message resent successfully!");
-            } else {
-                console.error(
-                    "[matterbridge] Error sending message:",
-                    response.status,
-                );
-            }
-        })
-        .catch((error) => {
-            console.error("[matterbridge] Error:", error);
-        });
+    return data;
 }
 
 function extract_username(resp) {
