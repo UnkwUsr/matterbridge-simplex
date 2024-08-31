@@ -122,7 +122,6 @@ async function listen_simplex() {
 
 function matterbridge_send(text, username, file = undefined) {
     const url = "http://127.0.0.1:4242/api/message";
-    [text, username] = filter_censor_message(text, username);
     const data = {
         text: text,
         username: username,
@@ -139,6 +138,12 @@ function matterbridge_send(text, username, file = undefined) {
                 },
             ],
         };
+    }
+
+    if (text.startsWith("/hide")) {
+        data.text =
+            "*This message was hidden by sender. You can read it only from SimpleX Chat.*";
+        delete data.Extra;
     }
 
     fetch(url, {
@@ -161,17 +166,6 @@ function matterbridge_send(text, username, file = undefined) {
         .catch((error) => {
             console.error("[matterbridge] Error:", error);
         });
-}
-
-function filter_censor_message(text, sender) {
-    if (text.startsWith("/hide")) {
-        return [
-            "*This message was censored by sender. You can read it only from SimpleX Chat.*",
-            "*censored*",
-        ];
-    } else {
-        return [text, sender];
-    }
 }
 
 function extract_username(resp) {
