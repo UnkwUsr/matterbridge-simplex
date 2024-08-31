@@ -161,6 +161,10 @@ function prepare_data(text, username, file) {
         gateway: "gateway1",
     };
     if (file) {
+        // hack to make matterbridge show sender name on empty text
+        if(text == "")
+            text = " ";
+
         const [content, filename] = file;
         data.Extra = {
             file: [
