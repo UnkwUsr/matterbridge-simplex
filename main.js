@@ -1,3 +1,9 @@
+// TODO: currently idk how to get this number. This I get from newChatItem
+const simplex_contactId = 4;
+
+const MATTERBRIDGE_ADDRESS = "127.0.0.1:4242";
+const SIMPLEX_ADDRESS = "127.0.0.1:5225";
+
 // fix for node < 18 (like on Ubuntu)
 try {
     global.fetch = require("node-fetch");
@@ -11,15 +17,11 @@ const { ciContentText, ChatInfoType } = require(
     "./lib/simplex-chat-client-typescript/dist/response",
 );
 
-// TODO: currently idk how to get this number. This I get from newChatItem
-const simplex_contactId = 3;
-
 globalThis.simplex_chat = -1;
-listen_simplex();
-// Promise.all([listen_simplex(), listen_matterbridge()]);
+Promise.all([listen_simplex(), listen_matterbridge()]);
 
 async function init_simplex() {
-    const chat = await ChatClient.create("ws://localhost:5225");
+    const chat = await ChatClient.create("ws://" + SIMPLEX_ADDRESS);
     // this example assumes that you have initialized user profile for chat bot via terminal CLI
     const user = await chat.apiGetActiveUser();
     if (!user) {
@@ -94,42 +96,44 @@ async function listen_simplex() {
     }
 }
 
-// async function listen_matterbridge() {
-//     while (true) {
-//         try {
-//             const response = await fetch("http://127.0.0.1:4242/api/messages");
-//             if (!response.ok) {
-//                 throw new Error("[matterbridge] HTTP error ${response.status}");
-//             }
-//             const data = await response.json();
+async function listen_matterbridge() {
+    while (true) {
+        try {
+            const response = await fetch(
+                "http://" + MATTERBRIDGE_ADDRESS + "/api/messages",
+            );
+            if (!response.ok) {
+                throw new Error("[matterbridge] HTTP error ${response.status}");
+            }
+            const data = await response.json();
 
-//             for (ev of data) {
-//                 await simplex_send(ev.text, ev.username);
-//             }
+            for (ev of data) {
+                await simplex_send(ev.text, ev.username);
+            }
 
-//             await new Promise((resolve) => setTimeout(resolve, 1000));
-//         } catch (error) {
-//             console.error(
-//                 "[matterbridge] Error listening for messages:",
-//                 error,
-//             );
-//         }
-//     }
-// }
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        } catch (error) {
+            console.error(
+                "[matterbridge] Error listening for messages:",
+                error,
+            );
+        }
+    }
+}
 
-// async function simplex_send(text, username) {
-//     text = username + ": " + text;
-//     console.log("[simplex] Message resent successfully!");
+async function simplex_send(text, username) {
+    text = username + ": " + text;
+    console.log("[simplex] Message resent successfully!");
 
-//     await globalThis.simplex_chat.apiSendTextMessage(
-//         ChatType.Direct,
-//         simplex_contactId,
-//         text,
-//     );
-// }
+    await globalThis.simplex_chat.apiSendTextMessage(
+        ChatType.Direct,
+        simplex_contactId,
+        text,
+    );
+}
 
 function matterbridge_send(text, username, file = undefined) {
-    const url = "http://127.0.0.1:4242/api/message";
+    const url = "http://" + MATTERBRIDGE_ADDRESS + "/api/message";
     const data = prepare_data(text, username, file);
 
     fetch(url, {
@@ -162,8 +166,9 @@ function prepare_data(text, username, file) {
     };
     if (file) {
         // hack to make matterbridge show sender name on empty text
-        if(text == "")
+        if (text == "") {
             text = " ";
+        }
 
         const [content, filename] = file;
         data.Extra = {
