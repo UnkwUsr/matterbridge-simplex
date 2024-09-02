@@ -1,5 +1,5 @@
 // TODO: currently idk how to get this number. This I get from newChatItem
-const simplex_contactId = 4;
+const simplex_contactId = 1;
 
 const MATTERBRIDGE_ADDRESS = "127.0.0.1:4242";
 const SIMPLEX_ADDRESS = "127.0.0.1:5225";
@@ -126,7 +126,9 @@ async function simplex_send(text, username) {
     console.log("[simplex] Message resent successfully!");
 
     await globalThis.simplex_chat.apiSendTextMessage(
-        ChatType.Direct,
+        // TODO: how we should determine type here? Only confiig seems
+        // applicable
+        ChatType.Group,
         simplex_contactId,
         text,
     );
