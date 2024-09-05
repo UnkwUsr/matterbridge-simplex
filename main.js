@@ -56,7 +56,7 @@ async function listen_simplex() {
                     const { chatInfo } = resp.chatItem;
                     // if (chatInfo.type !== ChatInfoType.Direct) continue;
 
-                    const username = resp.user.localDisplayName;
+                    const username = chatInfo.contact.localDisplayName;
                     const msg = ciContentText(resp.chatItem.chatItem.content);
                     if (msg) {
                         matterbridge_send(msg, username);
