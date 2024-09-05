@@ -7,7 +7,7 @@ const { ChatClient } = require("./lib/simplex-chat-client-typescript");
 const { ChatType } = require(
     "./lib/simplex-chat-client-typescript/dist/command",
 );
-const { ciContentText } = require(
+const { ciContentText, ChatInfoType } = require(
     "./lib/simplex-chat-client-typescript/dist/response",
 );
 
@@ -55,13 +55,22 @@ async function listen_simplex() {
                 // }
                 case "newChatItem": {
                     const { chatInfo } = resp.chatItem;
-                    // if (chatInfo.type !== ChatInfoType.Direct) continue;
+                    if (chatInfo.type == ChatInfoType.ContactRequest) continue;
 
-                    const username = chatInfo.contact.localDisplayName;
+                    var username;
+                    if (chatInfo.type == ChatInfoType.Direct) {
+                        username = chatInfo.contact.localDisplayName;
+                    }
+                    if (chatInfo.type == ChatInfoType.Group) {
+                        username = resp.chatItem.chatItem.chatDir.groupMember
+                            .localDisplayName;
+                    }
+
                     const msg = ciContentText(resp.chatItem.chatItem.content);
                     if (msg) {
                         matterbridge_send(msg, username);
                     }
+                    break;
                 }
             }
         }
