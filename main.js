@@ -1,4 +1,6 @@
-// TODO: currently idk how to get this number. This I get from newChatItem
+// TODO: currently idk how to get this number. This I get from newChatItem:
+// * chatItem.chatInfo.contact.contactId
+// * chatItem.chatInfo.groupInfo.groupId
 const simplex_contactId = 1;
 
 const MATTERBRIDGE_ADDRESS = "127.0.0.1:4242";
@@ -65,7 +67,7 @@ async function listen_simplex() {
                     const username = extract_username(resp);
                     const msg = ciContentText(resp.chatItem.chatItem.content);
                     if (msg) {
-                        console.log("Resending text");
+                        console.log("[matter->sxc] Resending text");
                         matterbridge_send(msg, username);
                     }
                     break;
@@ -84,7 +86,7 @@ async function listen_simplex() {
                     const file = [content, filename];
 
                     const username = extract_username(resp);
-                    console.log("Resending file");
+                    console.log("[matter->sxc] Resending file");
                     matterbridge_send(text, username, file);
                     break;
                 }
@@ -123,8 +125,6 @@ async function listen_matterbridge() {
 
 async function simplex_send(text, username) {
     text = username + ": " + text;
-    console.log("[simplex] Message resent successfully!");
-
     await globalThis.simplex_chat.apiSendTextMessage(
         // TODO: how we should determine type here? Only confiig seems
         // applicable
@@ -132,6 +132,7 @@ async function simplex_send(text, username) {
         simplex_contactId,
         text,
     );
+    console.log("[matter->sxc] Message resent successfully!");
 }
 
 function matterbridge_send(text, username, file = undefined) {
@@ -147,16 +148,16 @@ function matterbridge_send(text, username, file = undefined) {
     })
         .then((response) => {
             if (response.ok) {
-                console.log("[matterbridge] Message resent successfully!");
+                console.log("[sxc->matter] Message resent successfully!");
             } else {
                 console.error(
-                    "[matterbridge] Error sending message:",
+                    "[sxc->matter] Error sending message:",
                     response.status,
                 );
             }
         })
         .catch((error) => {
-            console.error("[matterbridge] Error:", error);
+            console.error("[sxc->matter] Error:", error);
         });
 }
 
