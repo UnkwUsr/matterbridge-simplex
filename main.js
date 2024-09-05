@@ -1,11 +1,3 @@
-// TODO: currently idk how to get this number. This I get from newChatItem:
-// * chatItem.chatInfo.contact.contactId
-// * chatItem.chatInfo.groupInfo.groupId
-const simplex_contactId = 1;
-
-const MATTERBRIDGE_ADDRESS = "127.0.0.1:4242";
-const SIMPLEX_ADDRESS = "127.0.0.1:5225";
-
 // fix for node < 18 (like on Ubuntu)
 try {
     global.fetch = require("node-fetch");
@@ -18,6 +10,22 @@ const { ChatType } = require(
 const { ciContentText, ChatInfoType } = require(
     "./lib/simplex-chat-client-typescript/dist/response",
 );
+
+if (process.argv.length < 7) {
+    console.error(
+        "Usage: <MATTERBRIDGE_API_ADDRESS> <MATTERBRIDGE_GATEWAY> <SIMPLEX_LISTEN_ADDRESS> <SIMPLEX_CHAT_ID> <CHAT_TYPE (contact/group)>",
+    );
+    process.exit(1);
+}
+
+const MATTERBRIDGE_ADDRESS = process.argv[3];
+const MATTERBRIDGE_GATEWAY = process.argv[4];
+const SIMPLEX_ADDRESS = process.argv[5];
+// this one is hard to get manually. I got from newChatItem:
+// * chatItem.chatInfo.contact.contactId
+// * chatItem.chatInfo.groupInfo.groupId
+const simplex_contactId = process.argv[6];
+const chat_type = process.argv[7];
 
 globalThis.simplex_chat = -1;
 Promise.all([listen_simplex(), listen_matterbridge()]);
@@ -126,9 +134,7 @@ async function listen_matterbridge() {
 async function simplex_send(text, username) {
     text = username + ": " + text;
     await globalThis.simplex_chat.apiSendTextMessage(
-        // TODO: how we should determine type here? Only confiig seems
-        // applicable
-        ChatType.Group,
+        chat_type == "contact" ? ChatType.Direct : ChatType.Group,
         simplex_contactId,
         text,
     );
@@ -165,7 +171,7 @@ function prepare_data(text, username, file) {
     const data = {
         text: text,
         username: username,
-        gateway: "gateway1",
+        gateway: MATTERBRIDGE_GATEWAY,
     };
     if (file) {
         // hack to make matterbridge show sender name on empty text
