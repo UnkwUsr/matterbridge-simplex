@@ -1,3 +1,8 @@
+// fix for node < 18 (like on Ubuntu)
+try {
+    global.fetch = require("node-fetch");
+} catch {}
+
 const { ChatClient } = require("./lib/simplex-chat-client-typescript");
 const { ChatType } = require(
     "./lib/simplex-chat-client-typescript/dist/command",
