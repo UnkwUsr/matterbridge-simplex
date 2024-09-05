@@ -57,15 +57,7 @@ async function listen_simplex() {
                     const { chatInfo } = resp.chatItem;
                     if (chatInfo.type == ChatInfoType.ContactRequest) continue;
 
-                    var username;
-                    if (chatInfo.type == ChatInfoType.Direct) {
-                        username = chatInfo.contact.localDisplayName;
-                    }
-                    if (chatInfo.type == ChatInfoType.Group) {
-                        username = resp.chatItem.chatItem.chatDir.groupMember
-                            .localDisplayName;
-                    }
-
+                    const username = extract_username(resp);
                     const msg = ciContentText(resp.chatItem.chatItem.content);
                     if (msg) {
                         matterbridge_send(msg, username);
@@ -150,5 +142,17 @@ function filter_censor_message(text, sender) {
         ];
     } else {
         return [text, sender];
+    }
+}
+
+function extract_username(resp) {
+    const { chatInfo } = resp.chatItem;
+
+    if (chatInfo.type == ChatInfoType.Direct) {
+        return chatInfo.contact.localDisplayName;
+    }
+    if (chatInfo.type == ChatInfoType.Group) {
+        return resp.chatItem.chatItem.chatDir.groupMember
+            .localDisplayName;
     }
 }
