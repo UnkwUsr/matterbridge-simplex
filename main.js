@@ -15,7 +15,8 @@ const { ciContentText } = require(
 const simplex_contactId = 3;
 
 globalThis.simplex_chat = -1;
-Promise.all([listen_simplex(), listen_matterbridge()]);
+listen_simplex();
+// Promise.all([listen_simplex(), listen_matterbridge()]);
 
 async function init_simplex() {
     const chat = await ChatClient.create("ws://localhost:5225");
@@ -67,39 +68,39 @@ async function listen_simplex() {
     }
 }
 
-async function listen_matterbridge() {
-    while (true) {
-        try {
-            const response = await fetch("http://127.0.0.1:4242/api/messages");
-            if (!response.ok) {
-                throw new Error("[matterbridge] HTTP error ${response.status}");
-            }
-            const data = await response.json();
+// async function listen_matterbridge() {
+//     while (true) {
+//         try {
+//             const response = await fetch("http://127.0.0.1:4242/api/messages");
+//             if (!response.ok) {
+//                 throw new Error("[matterbridge] HTTP error ${response.status}");
+//             }
+//             const data = await response.json();
 
-            for (ev of data) {
-                await simplex_send(ev.text, ev.username);
-            }
+//             for (ev of data) {
+//                 await simplex_send(ev.text, ev.username);
+//             }
 
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-        } catch (error) {
-            console.error(
-                "[matterbridge] Error listening for messages:",
-                error,
-            );
-        }
-    }
-}
+//             await new Promise((resolve) => setTimeout(resolve, 1000));
+//         } catch (error) {
+//             console.error(
+//                 "[matterbridge] Error listening for messages:",
+//                 error,
+//             );
+//         }
+//     }
+// }
 
-async function simplex_send(text, username) {
-    text = username + ": " + text;
-    console.log("[simplex] Message resent successfully!");
+// async function simplex_send(text, username) {
+//     text = username + ": " + text;
+//     console.log("[simplex] Message resent successfully!");
 
-    await globalThis.simplex_chat.apiSendTextMessage(
-        ChatType.Direct,
-        simplex_contactId,
-        text,
-    );
-}
+//     await globalThis.simplex_chat.apiSendTextMessage(
+//         ChatType.Direct,
+//         simplex_contactId,
+//         text,
+//     );
+// }
 
 function matterbridge_send(text, username) {
     const url = "http://127.0.0.1:4242/api/message";
