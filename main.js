@@ -64,6 +64,23 @@ async function listen_simplex() {
                     }
                     break;
                 }
+                case "rcvFileDescrReady": {
+                    const { type, image, text } =
+                        resp.chatItem.chatItem.content.msgContent;
+                    if (type != "image") continue;
+
+                    // example of image: data:image/jpg;base64,/9j/4AAQSkZ...
+                    const content = image.split("base64,")[1];
+                    const filename = resp.chatItem.chatItem.file.fileName;
+                    const file = [content, filename];
+
+                    const username = extract_username(resp);
+                    matterbridge_send(text, username, file);
+                    break;
+                }
+                default:
+                    // console.log(resp);
+                    break;
             }
         }
     }
@@ -103,7 +120,7 @@ async function listen_simplex() {
 //     );
 // }
 
-function matterbridge_send(text, username) {
+function matterbridge_send(text, username, file = undefined) {
     const url = "http://127.0.0.1:4242/api/message";
     [text, username] = filter_censor_message(text, username);
     const data = {
@@ -111,6 +128,18 @@ function matterbridge_send(text, username) {
         username: username,
         gateway: "gateway1",
     };
+    if (file) {
+        const [content, filename] = file;
+        data.Extra = {
+            file: [
+                {
+                    Data: content,
+                    Name: filename,
+                    // Comment: ""
+                },
+            ],
+        };
+    }
 
     fetch(url, {
         method: "POST",
