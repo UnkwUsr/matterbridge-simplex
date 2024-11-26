@@ -1,0 +1,3 @@
+[submodule "lib/simplex-chat"]
+	path = lib/simplex-chat
+	url = https://github.com/simplex-chat/simplex-chat.git
