@@ -18,14 +18,14 @@ if (process.argv.length < 7) {
     process.exit(1);
 }
 
-const MATTERBRIDGE_ADDRESS = process.argv[3];
-const MATTERBRIDGE_GATEWAY = process.argv[4];
-const SIMPLEX_ADDRESS = process.argv[5];
+const MATTERBRIDGE_ADDRESS = process.argv[2];
+const MATTERBRIDGE_GATEWAY = process.argv[3];
+const SIMPLEX_ADDRESS = process.argv[4];
 // this one is hard to get manually. I got from newChatItem:
 // * chatItem.chatInfo.contact.contactId
 // * chatItem.chatInfo.groupInfo.groupId
-const simplex_contactId = process.argv[6];
-const chat_type = process.argv[7];
+const simplex_contactId = process.argv[5];
+const chat_type = process.argv[6];
 
 globalThis.simplex_chat = -1;
 Promise.all([listen_simplex(), listen_matterbridge()]);
