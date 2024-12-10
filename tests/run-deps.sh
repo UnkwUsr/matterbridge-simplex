@@ -3,7 +3,7 @@ tmux split-window -h 'sudo ./ssh-chat/ssh-chat --verbose --bind 127.0.0.1:48320 
 
 echo 'waiting 5 sec, you starting ssh-chat' && sleep 5
 tmux split-window -h 'ssh 127.0.0.1 -p 48320'
-matterbridge -conf test-matter-simplex.toml
+matterbridge -conf ssh-chat.toml
 
 tmux select-layout even-horizontal
 
