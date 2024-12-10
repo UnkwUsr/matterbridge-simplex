@@ -73,3 +73,9 @@ Example:
 ```
 node main.js 127.0.0.1:4242 gateway1 127.0.0.1:5225 1 group
 ```
+
+P.S. getting simplex chat id is a little bit hard. You can try guess if you
+have few chats, or use next command to get list of them:
+```
+simplex-chat -e '/_get chats 1 pcc=off' | tail -n +2 | jq '.[].chatInfo | (.groupInfo // .contact) | [.groupId // .contactId, .localDisplayName]'
+```
