@@ -65,15 +65,15 @@ async function listen_simplex() {
                 //     console.log(`[simplex] ${contact.profile.displayName} connected`);
                 //     continue;
                 // }
-                case "newChatItem": {
-                    const { chatInfo } = resp.chatItem;
+                case "newChatItems": {
+                    const { chatInfo } = resp.chatItems[0];
                     if (chatInfo.type == ChatInfoType.ContactRequest) continue;
                     // skipping, to not duplicate messages: one with text only
                     // and second with text and file
-                    if (resp.chatItem.chatItem.file) continue;
+                    if (resp.chatItems[0].chatItem.file) continue;
 
-                    const username = extract_username(resp);
-                    const msg = ciContentText(resp.chatItem.chatItem.content);
+                    const username = extract_username(resp.chatItems[0]);
+                    const msg = ciContentText(resp.chatItems[0].chatItem.content);
                     if (msg) {
                         console.log("[matter->sxc] Resending text");
                         matterbridge_send(msg, username);
@@ -93,7 +93,7 @@ async function listen_simplex() {
                     const filename = resp.chatItem.chatItem.file.fileName;
                     const file = [content, filename];
 
-                    const username = extract_username(resp);
+                    const username = extract_username(resp.chatItem);
                     console.log("[matter->sxc] Resending file");
                     matterbridge_send(text, username, file);
                     break;
@@ -199,14 +199,14 @@ function prepare_data(text, username, file) {
     return data;
 }
 
-function extract_username(resp) {
-    const { chatInfo } = resp.chatItem;
+function extract_username(chatItem) {
+    const { chatInfo } = chatItem;
 
     if (chatInfo.type == ChatInfoType.Direct) {
         return chatInfo.contact.localDisplayName;
     }
     if (chatInfo.type == ChatInfoType.Group) {
-        return resp.chatItem.chatItem.chatDir.groupMember
+        return chatItem.chatItem.chatDir.groupMember
             .localDisplayName;
     }
 }
