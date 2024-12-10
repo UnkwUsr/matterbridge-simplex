@@ -8,6 +8,16 @@ adds support for [SimpleX Chat](https://github.com/simplex-chat/simplex-chat).
 * matterbridge version should be higher than `1.26.0` (although this is current
   latest release, so you have to build matterbridge from master branch)
 
+## Preparation
+
+Clone dependency library from simplex-chat repo (it is part of it) and build js
+from typescript:
+
+```
+git submodule update --init --recursive --depth 1
+( cd lib/simplex-chat-client-typescript/ && npm install && tsc )
+```
+
 ## Usage
 
 First start simplex chat (example on port 5225):
