@@ -5,8 +5,9 @@ adds support for [SimpleX Chat](https://github.com/simplex-chat/simplex-chat).
 
 * files not yet supported, but currently it can send images preview from
   simplex chat to matterbridge
-* matterbridge version should be higher than `1.26.0` (although this is current
-  latest release, so you have to build matterbridge from master branch)
+* matterbridge version should be higher than `1.26.0` (although at this moment
+  latest release is exactly `1.26.0`, so you have to build matterbridge from
+  master branch, which have fixes for api endpoint)
 
 ## Preparation
 
@@ -40,6 +41,17 @@ enable=true
 [[gateway.inout]]
 account="api.myapi"
 channel="api"
+
+# also of course you must add the second end of the bridge. Here is example
+for telegram: (for details read matterbridge docs)
+#
+# [telegram.mytg]
+# Token="tg_bot_token"
+# RemoteNickFormat="{NICK}: "
+#
+# [[gateway.inout]]
+# account="telegram.mytg"
+# channel="tg_channel_id"
 ```
 
 Run matterbridge:
