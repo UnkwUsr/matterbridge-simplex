@@ -2,12 +2,20 @@ version: "3"
 
 services:
 
+  node-app:
+    build:
+      dockerfile: Dockerfile.node-app
+    # restart: always
+    network_mode: host
+    command: 127.0.0.1:4242 gateway1 127.0.0.1:5225 1 group
+
   simplex:
     build:
       dockerfile: Dockerfile.simplex
     # restart: always
     volumes:
       - ./data/simplex:/app/.simplex/
+    network_mode: host
 
   matterbridge:
     build:
@@ -15,3 +23,4 @@ services:
     # restart: always
     volumes:
       - ./config/matterbridge.toml:/app/matterbridge.toml
+    network_mode: host

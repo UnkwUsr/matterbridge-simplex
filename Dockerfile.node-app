@@ -1,0 +1,27 @@
+FROM ubuntu:24.04
+
+RUN apt-get update && apt-get install -y \
+  git npm nodejs \
+  && rm -rf /var/cache/apk/* && apt-get autoremove -y && apt-get clean
+RUN npm install -g typescript
+
+WORKDIR /app
+# cloning single directory instead of whole repo
+# (https://stackoverflow.com/a/56504849)
+RUN git clone -n --depth=1 --filter=tree:0 \
+      https://github.com/simplex-chat/simplex-chat/ \
+    && cd simplex-chat \
+    && git sparse-checkout set --no-cone /packages/simplex-chat-client/typescript \
+    && git checkout
+# build simplex chat package to be used by main.js
+RUN cd simplex-chat/packages/simplex-chat-client/typescript && npm install && tsc
+RUN mkdir lib \
+    && mv simplex-chat/packages/simplex-chat-client/typescript lib/simplex-chat-client-typescript
+
+COPY main.js .
+
+# set non-root user
+RUN useradd -rm -d /app -s /bin/bash -g root -G sudo -u 1001 app
+USER app
+
+ENTRYPOINT ["node", "main.js"]
