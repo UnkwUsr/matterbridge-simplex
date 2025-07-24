@@ -11,6 +11,19 @@ adds support for [SimpleX Chat](https://github.com/simplex-chat/simplex-chat).
 
 ## Preparation
 
+### Docker
+
+* Download simplex-chat cli and matterbridge binaries.
+* Put them into repo root directory with names
+* Run simplex-chat-cli once and finish creating profile. Its data will be
+  created in `~/.simplex` directory. Make sure you're it is not colliding with
+  your possible another cli profile. (note: cli version database directory does
+  not collide with desktop version directory)
+* Put simplex database into `data/simplex` directory: `mkdir -p data/simplex &&
+  mv ~/.simplex/* data/simplex`
+
+### Manual
+
 Clone dependency library from simplex-chat repo (it is part of it) and build js
 from typescript:
 
@@ -76,6 +89,7 @@ node main.js 127.0.0.1:4242 gateway1 127.0.0.1:5225 1 group
 
 P.S. getting simplex chat id is a little bit hard. You can try guess if you
 have few chats, or use next command to get list of them:
+
 ```
 simplex-chat -e '/_get chats 1 pcc=off' | tail -n +2 | jq '.[].chatInfo | (.groupInfo // .contact) | [.groupId // .contactId, .localDisplayName]'
 ```
