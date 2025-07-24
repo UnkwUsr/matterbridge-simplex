@@ -45,7 +45,7 @@ async function init_simplex() {
     const address = (await chat.apiGetUserAddress()) ||
         (await chat.apiCreateUserAddress());
     console.log(`[simplex] Bot address: ${address}`);
-    await chat.disableAddressAutoAccept();
+    // await chat.disableAddressAutoAccept();
 
     return chat;
 }

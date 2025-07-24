@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile.node-app
     # restart: always
     network_mode: host
+    # format: <MATTERBRIDGE_API_ADDRESS> <MATTERBRIDGE_GATEWAY> <SIMPLEX_LISTEN_ADDRESS> <SIMPLEX_CHAT_ID> <CHAT_TYPE (contact/group)>
     command: 127.0.0.1:4242 gateway1 127.0.0.1:5225 1 group
 
   simplex:
@@ -15,6 +16,8 @@ services:
     # restart: always
     volumes:
       - ./data/simplex:/app/.simplex/
+    # must be host mode, because simplex websocket always liten only on
+    # 127.0.0.1
     network_mode: host
 
   matterbridge:

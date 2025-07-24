@@ -3,74 +3,63 @@
 This is adapter for [matterbridge](https://github.com/42wim/matterbridge) that
 adds support for [SimpleX Chat](https://github.com/simplex-chat/simplex-chat).
 
-* files not yet supported, but currently it can send images preview from
+* files not yet supported, but currently it can send image previews from
   simplex chat to matterbridge
 * matterbridge version should be higher than `1.26.0` (although at this moment
   latest release is exactly `1.26.0`, so you have to build matterbridge from
   master branch, which have fixes for api endpoint)
+  * UPD: can download latest version from maintained (not by me)
+    [fork](https://github.com/bibanon/matterbridge/releases) or just use docker
 
-## Preparation
+## Usage
 
-### Docker
+### docker-compose
 
-* Download simplex-chat cli and matterbridge binaries.
-* Put them into repo root directory with names
-* Run simplex-chat-cli once and finish creating profile. Its data will be
-  created in `~/.simplex` directory. Make sure you're it is not colliding with
-  your possible another cli profile. (note: cli version database directory does
-  not collide with desktop version directory)
-* Put simplex database into `data/simplex` directory: `mkdir -p data/simplex &&
-  mv ~/.simplex/* data/simplex`
+* Run simplex chat cli once locally, create profile, set profile picture and
+  add it to some chat. Its database will be created in `~/.simplex` directory.
+  Make sure it is not colliding with your possibly existing database.
+  * note: for easy of use, connect bot to chat you want with the first try.
+    This is because under the hood `docker-compose.yml` have hardcoded chat id.
+    Or you can find it (chat id) later by following instruction in
+    [manual](#manual) section and update `docker-compose.yml` correspondingly.
+* Put simplex database into `data/simplex` of this repository directory
+
+  ```
+  mkdir -p data/simplex && mv ~/.simplex/* data/simplex/
+  ```
+
+* Configure `matterbridge.toml` (copy example from `matterbridge.toml.example`
+  and follow matterbridge
+  [documentation](https://github.com/42wim/matterbridge/wiki/How-to-create-your-config))
+* Run:
+
+  ```
+  docker compose up --build`
+  ```
 
 ### Manual
 
 Clone dependency library from simplex-chat repo (it is part of it) and build js
-from typescript:
+from typescript (you need to have installed nodejs, npm and typescript):
 
 ```
 git submodule update --init --recursive --depth 1
 ( cd lib/simplex-chat-client-typescript/ && npm install && tsc )
 ```
 
-## Usage
-
-First start simplex chat (example on port 5225):
+Start simplex chat websocket server (example on port 5225):
 
 ```
 simplex-chat -p 5225
 ```
 
-Then configure api endpoint in matterbridge:
-
-```
-[api.myapi]
-BindAddress="127.0.0.1:4242"
-Buffer=1000
-
-[[gateway]]
-name="gateway1"
-enable=true
-
-[[gateway.inout]]
-account="api.myapi"
-channel="api"
-
-# also of course you must add the second end of the bridge. Here is example
-for telegram: (for details read matterbridge docs)
-#
-# [telegram.mytg]
-# Token="tg_bot_token"
-# RemoteNickFormat="{NICK}: "
-#
-# [[gateway.inout]]
-# account="telegram.mytg"
-# channel="tg_channel_id"
-```
+Configure matterbridge api endpoint (copy file `matterbridge.toml.example` to
+`matterbridge.toml` and edit to your needs)
 
 Run matterbridge:
 
 ```
-matterbridge -conf example.toml
+matterbridge -conf matterbridge.toml
 ```
 
 And finally run our bridge between matterbridge api and simplex chat:
@@ -93,3 +82,7 @@ have few chats, or use next command to get list of them:
 ```
 simplex-chat -e '/_get chats 1 pcc=off' | tail -n +2 | jq '.[].chatInfo | (.groupInfo // .contact) | [.groupId // .contactId, .localDisplayName]'
 ```
+
+## Contact
+
+Contact me via simplex chat: <https://smp12.simplex.im/a#fvW9jWlBynDpPlMfFz-wXfR2D9iRmWf--nsDArGTm5I>
