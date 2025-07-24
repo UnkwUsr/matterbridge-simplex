@@ -1,0 +1,11 @@
+FROM ubuntu:24.04
+
+WORKDIR /app
+COPY ./simplex-chat-ubuntu-24_04-x86-64_v6.4.0 ./simplex-chat
+RUN chmod +x ./simplex-chat
+
+# set non-root user
+RUN useradd -rm -d /app -s /bin/bash -g root -G sudo -u 1001 app
+USER app
+
+ENTRYPOINT ["/app/simplex-chat", "-p", "5225"]

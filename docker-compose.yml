@@ -2,6 +2,13 @@ version: "3"
 
 services:
 
+  simplex:
+    build:
+      dockerfile: Dockerfile.simplex
+    # restart: always
+    volumes:
+      - ./data/simplex:/app/.simplex/
+
   matterbridge:
     build:
       dockerfile: Dockerfile.matterbridge
