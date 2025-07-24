@@ -1,0 +1,15 @@
+FROM debian:bookworm-slim AS runtime
+
+RUN apt-get update && apt-get install -y \
+  ca-certificates \
+  && rm -rf /var/cache/apk/* && apt-get autoremove -y && apt-get clean
+
+WORKDIR /app
+COPY ./matterbridge-1.26.2-dev-linux-64bit ./matterbridge
+RUN chmod +x ./matterbridge
+
+## switch to non-root user
+RUN adduser --shell /bin/bash --home /app appuser
+USER appuser
+
+ENTRYPOINT "/app/matterbridge"

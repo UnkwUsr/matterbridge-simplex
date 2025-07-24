@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+
+  matterbridge:
+    build:
+      dockerfile: Dockerfile.matterbridge
+    # restart: always
+    volumes:
+      - ./config/matterbridge.toml:/app/matterbridge.toml
