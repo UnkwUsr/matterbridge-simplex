@@ -1,7 +1,13 @@
 FROM ubuntu:24.04
 
+RUN apt-get update && apt-get install -y \
+  wget \
+  && rm -rf /var/cache/apk/* && apt-get autoremove -y && apt-get clean
+
 WORKDIR /app
-COPY ./simplex-chat-ubuntu-24_04-x86-64_v6.4.0 ./simplex-chat
+RUN wget \
+    "https://github.com/simplex-chat/simplex-chat/releases/download/v6.4.0/simplex-chat-ubuntu-24_04-x86-64" \
+    -O ./simplex-chat
 RUN chmod +x ./simplex-chat
 
 # set non-root user

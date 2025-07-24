@@ -1,11 +1,15 @@
 FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update && apt-get install -y \
-  ca-certificates \
+  wget ca-certificates \
   && rm -rf /var/cache/apk/* && apt-get autoremove -y && apt-get clean
 
 WORKDIR /app
-COPY ./matterbridge-1.26.2-dev-linux-64bit ./matterbridge
+# downloading not from official repo because we need version with master branch
+# changes, but official repo not released it yet
+RUN wget \
+    "https://github.com/bibanon/matterbridge/releases/download/v1.26.2/matterbridge-1.26.2-dev-linux-64bit" \
+    -O ./matterbridge
 RUN chmod +x ./matterbridge
 
 ## switch to non-root user
