@@ -22,5 +22,5 @@ services:
       dockerfile: Dockerfile.matterbridge
     # restart: always
     volumes:
-      - ./config/matterbridge.toml:/app/matterbridge.toml
+      - ./matterbridge.toml:/app/matterbridge.toml
     network_mode: host

@@ -1,0 +1,22 @@
+[api.myapi]
+BindAddress="127.0.0.1:4242"
+Buffer=1000
+
+[[gateway]]
+name="gateway1"
+enable=true
+
+[[gateway.inout]]
+account="api.myapi"
+channel="api"
+
+## also of course we must add the second end of the bridge. Here is example
+## for telegram: (for details read matterbridge docs)
+# [telegram.mytg]
+# Token="<tg_bot_token>"
+# RemoteNickFormat="{NICK}: "
+
+## and finally connect it to gateway
+# [[gateway.inout]]
+# account="telegram.mytg"
+# channel="tg_channel_id"
