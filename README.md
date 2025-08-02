@@ -15,26 +15,26 @@ adds support for [SimpleX Chat](https://github.com/simplex-chat/simplex-chat).
 
 ### docker-compose
 
-* Run simplex chat cli once locally, create profile, set profile picture and
-  add it to some chat. Its database will be created in `~/.simplex` directory.
-  Make sure it is not colliding with your possibly existing database.
-  * note: for easy of use, connect bot to chat you want with the first try.
-    This is because under the hood `docker-compose.yml` have hardcoded chat id.
-    Or you can find it (chat id) later by following instruction in
-    [manual](#manual) section and update `docker-compose.yml` correspondingly.
-* Put simplex database into `data/simplex` of this repository directory
-
-  ```
-  mkdir -p data/simplex && mv ~/.simplex/* data/simplex/
-  ```
-
+* Prepare SimpleX Chat database
+  * Easiest way is to run simplex-chat cli version, then your database will be
+    at `~/.simplex` directory.
+  * While you're there, before moving database you have to add this bot profile
+    to some chat you want to be used for bridging. (it's id should be 4, which
+    is default hardcoded in docker-compose file. You can find it by following
+    [Obtaining chat id](#Obtaining_chat_id) tip. If it differs, then edit
+    docker-compose.yml file).
+  * Finally move database to `data/simplex` and give it permissions: `mkdir -p
+    data/simplex && mv ~/.simplex/simplex_v1_* data/simplex && chmod 777 data/
+    -R`
+    * P.S. giving 777 permissions is not really good idea, but I don't know any
+      other simple way to make it work with docker.
 * Configure `matterbridge.toml` (copy example from `matterbridge.toml.example`
   and follow matterbridge
   [documentation](https://github.com/42wim/matterbridge/wiki/How-to-create-your-config))
 * Run:
 
   ```
-  docker compose up --build`
+  docker compose up --build
   ```
 
 ### Manual
@@ -76,8 +76,15 @@ Example:
 node main.js 127.0.0.1:4242 gateway1 127.0.0.1:5225 4 group
 ```
 
-P.S. getting simplex chat id is a little bit hard. You can try guess if you
-have few chats, or use next command to get list of them:
+## Tips
+
+### Obtaining chat id
+
+You can get chat id of selected chat by using cli command `/i #group_name` or
+`/i @contact_name`.
+
+You can get list of all chats with their id's with this command (requires
+[jq](https://github.com/jqlang/jq) utility to be installed):
 
 ```
 simplex-chat -e '/_get chats 1 pcc=off' | tail -n +2 | jq '.[].chatInfo | (.groupInfo // .contact) | [.groupId // .contactId, .localDisplayName]'

@@ -22,6 +22,11 @@ services:
       dockerfile: Dockerfile.simplex
     # restart: always
     volumes:
+      # Either put your simplex database into data/simplex directory, or edit
+      # path to point where your simplex database is.
+      #
+      # Also don't forget to give permissions to this directory, otherwise
+      # simplex will give error "attempt to write a readonly database"
       - ./data/simplex:/app/.simplex/
     # must be host mode, because simplex websocket always liten only on
     # 127.0.0.1
