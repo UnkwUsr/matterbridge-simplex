@@ -73,7 +73,7 @@ node main.js <MATTERBRIDGE_API_ADDRESS> <MATTERBRIDGE_GATEWAY> <SIMPLEX_LISTEN_A
 Example:
 
 ```
-node main.js 127.0.0.1:4242 gateway1 127.0.0.1:5225 1 group
+node main.js 127.0.0.1:4242 gateway1 127.0.0.1:5225 4 group
 ```
 
 P.S. getting simplex chat id is a little bit hard. You can try guess if you
