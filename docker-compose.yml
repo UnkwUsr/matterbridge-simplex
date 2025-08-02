@@ -8,11 +8,7 @@ services:
     # restart: always
     network_mode: host
     # format: <MATTERBRIDGE_API_ADDRESS> <MATTERBRIDGE_GATEWAY> <SIMPLEX_LISTEN_ADDRESS> <SIMPLEX_CHAT_ID> <CHAT_TYPE (contact/group)>
-    #
-    # defafult contact id is 4 because 2 and 3 are pre-existing "SimpleX
-    # Status" and "Ask SimpleX Team" contacts (idk who is id = 1), so first
-    # real added contact will have id 4
-    command: 127.0.0.1:4242 gateway1 127.0.0.1:5225 4 group
+    command: 127.0.0.1:4242 gateway1 127.0.0.1:5225 1 group
     depends_on:
       - simplex
       - matterbridge
