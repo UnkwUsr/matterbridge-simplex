@@ -24,7 +24,7 @@ const SIMPLEX_ADDRESS = process.argv[4];
 // this one is hard to get manually. I got from newChatItem:
 // * chatItem.chatInfo.contact.contactId
 // * chatItem.chatInfo.groupInfo.groupId
-const simplex_contactId = process.argv[5];
+const simplex_chat_id = process.argv[5];
 const chat_type = process.argv[6];
 
 globalThis.simplex_chat = -1;
@@ -41,6 +41,9 @@ async function init_simplex() {
     console.log(
         `[simplex] Bot profile: ${user.profile.displayName} (${user.profile.fullName})`,
     );
+
+    await check_chat_id(chat, simplex_chat_id, chat_type);
+
     // creates or uses the existing long-term address for the bot
     const address = (await chat.apiGetUserAddress()) ||
         (await chat.apiCreateUserAddress());
@@ -73,7 +76,9 @@ async function listen_simplex() {
                     if (resp.chatItems[0].chatItem.file) continue;
 
                     const username = extract_username(resp.chatItems[0]);
-                    const msg = ciContentText(resp.chatItems[0].chatItem.content);
+                    const msg = ciContentText(
+                        resp.chatItems[0].chatItem.content,
+                    );
                     if (msg) {
                         console.log("[matter->sxc] Resending text");
                         matterbridge_send(msg, username);
@@ -135,7 +140,7 @@ async function simplex_send(text, username) {
     text = username + ": " + text;
     await globalThis.simplex_chat.apiSendTextMessage(
         chat_type == "contact" ? ChatType.Direct : ChatType.Group,
-        simplex_contactId,
+        simplex_chat_id,
         text,
     );
     console.log("[matter->sxc] Message resent successfully!");
@@ -209,4 +214,37 @@ function extract_username(chatItem) {
         return chatItem.chatItem.chatDir.groupMember
             .localDisplayName;
     }
+}
+
+async function check_chat_id(chat, chat_id, chat_type) {
+    const chat_id_prefix = chat_type == "contact" ? "@" : "#";
+
+    let r = await chat.sendChatCmdStr(
+        `/_info ${chat_id_prefix}${chat_id}`,
+    );
+    if (r["type"] == "chatCmdError") {
+        r = r["chatError"];
+        if (r["type"] == "errorStore") {
+            r = r["storeError"];
+            if (
+                r["type"] == "groupNotFound" || r["type"] == "contactNotFound"
+            ) {
+                console.log(
+                    `[simplex] Provided ${chat_type} id does not exists, probably contact/group mismatch. Please see tips section on how to obtain chat id.`,
+                );
+                process.exit(1);
+            }
+        }
+        console.log("Unknown error in check_chat_id:", r);
+        process.exit(1);
+    }
+
+    let info = null;
+    if (chat_type == "contact") {
+        info = r["contact"]["localDisplayName"];
+    } else {
+        info = r["groupInfo"]["localDisplayName"];
+    }
+    const name = info["localDisplayName"];
+    console.log(`[simplex] Bridging to ${chat_type} chat with name "${name}"`);
 }
