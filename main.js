@@ -230,7 +230,7 @@ async function check_chat_id(chat, chat_id, chat_type) {
                 r["type"] == "groupNotFound" || r["type"] == "contactNotFound"
             ) {
                 console.log(
-                    `[simplex] Provided ${chat_type} id does not exists, probably contact/group mismatch. Please see tips section on how to obtain chat id.`,
+                    `[simplex] Error: Provided ${chat_type} id does not exists, probably contact/group mismatch. Please see tips section on how to obtain chat id.`,
                 );
                 process.exit(1);
             }

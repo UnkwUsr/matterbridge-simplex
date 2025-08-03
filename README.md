@@ -10,6 +10,11 @@ adds support for [SimpleX Chat](https://github.com/simplex-chat/simplex-chat).
   master branch, which have fixes for api endpoint)
   * UPD: can download latest version from maintained (not by me)
     [fork](https://github.com/bibanon/matterbridge/releases) or just use docker
+* **bonus feature:** you can mark messages so that they can be read only from
+  simplex chat side. For it you need to send message in simplex chat that
+  starts with `/hide`. Example: `/hide this message will be replaced on all
+  other platforms with informational message about that message is hidden and
+  can be read only via simplex chat`
 
 ## Usage
 
