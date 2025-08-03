@@ -241,9 +241,9 @@ async function check_chat_id(chat, chat_id, chat_type) {
 
     let info = null;
     if (chat_type == "contact") {
-        info = r["contact"]["localDisplayName"];
+        info = r["contact"];
     } else {
-        info = r["groupInfo"]["localDisplayName"];
+        info = r["groupInfo"];
     }
     const name = info["localDisplayName"];
     console.log(`[simplex] Bridging to ${chat_type} chat with name "${name}"`);
