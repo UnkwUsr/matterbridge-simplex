@@ -138,12 +138,19 @@ async function listen_matterbridge() {
 
 async function simplex_send(text, username) {
     text = username + ": " + text;
-    await globalThis.simplex_chat.apiSendTextMessage(
-        chat_type == "contact" ? ChatType.Direct : ChatType.Group,
-        simplex_chat_id,
-        text,
-    );
-    console.log("[matter->sxc] Message resent successfully!");
+    try {
+        await globalThis.simplex_chat.apiSendTextMessage(
+            chat_type == "contact" ? ChatType.Direct : ChatType.Group,
+            simplex_chat_id,
+            text,
+        );
+        console.log("[matter->sxc] Message resent successfully!");
+    } catch (err) {
+        // converting to json to display whole object (else it will be printed
+        // as just "[Object]")
+        const err_json = JSON.stringify(err, null, 4);
+        console.log("[matter->sxc] Error on sxc sending message:", err_json);
+    }
 }
 
 function matterbridge_send(text, username, file = undefined) {
