@@ -85,6 +85,11 @@ node main.js 127.0.0.1:4242 gateway1 127.0.0.1:5225 1 group
 
 ### Obtaining chat id
 
+**Please note:**, in simplex chat, group chats and contact chats have their own
+separated ids, that mean you can easily have **group** chat with id 5 AND
+**contact** chat with id 5 and this is normal. This is why you have to know
+both id and type of the chat.
+
 You can get chat id of selected chat by using cli command `/i #group_name` or
 `/i @contact_name`.
 
@@ -92,7 +97,9 @@ You can get list of all chats with their id's with this command (requires
 [jq](https://github.com/jqlang/jq) utility to be installed):
 
 ```
-simplex-chat -e '/_get chats 1 pcc=off' | tail -n +2 | jq '.[].chatInfo | (.groupInfo // .contact) | [.groupId // .contactId, .localDisplayName]'
+simplex-chat -e '/_get chats 1 pcc=off' \
+  | tail -n +2 \
+  | jq '.[].chatInfo | (.groupInfo // .contact) | {name: .localDisplayName, type: (if .groupId then "group" else "contact" end), id: .groupId // .contactId}'
 ```
 
 ## Contact
