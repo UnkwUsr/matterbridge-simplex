@@ -9,6 +9,7 @@ WORKDIR /app
 # cloning single directory instead of whole repo
 # (https://stackoverflow.com/a/56504849)
 RUN git clone -n --depth=1 --filter=tree:0 \
+      --branch "v6.4.0" \
       https://github.com/simplex-chat/simplex-chat/ \
     && cd simplex-chat \
     && git sparse-checkout set --no-cone /packages/simplex-chat-client/typescript \
